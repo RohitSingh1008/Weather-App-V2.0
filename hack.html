@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Network Status</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    .banner {
+      position: fixed;
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      padding: 7px 12px;
+      color: #fff;
+      border-radius: 50px;
+      z-index: 1000;
+      width: calc(100% - 40px);
+      max-width: 400px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
+    }
+
+    .banner span {
+      font-size: 16px;
+      font-weight: bold;
+    }
+
+    .banner .close-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+      margin-left: 10px;
+      margin-top: 3px;
+    }
+   
+
+    .offline {
+      background-color: #e74c3c;
+      padding-bottom: 8px;
+      bottom: 20px;
+      right: -450px;
+      animation: slideInFromRight 0.6s ease-out forwards;
+    }
+
+    .online {
+      background-color: #2ecc71;
+      padding-bottom: px;
+      top: 20px;
+      left: -450px;
+      animation: slideInFromLeft 0.6s ease-out forwards;
+    }
+
+    /* Rubber bounce-in animations */
+    @keyframes slideInFromRight {
+      0% { right: -450px; transform: scaleX(0.7); }
+      60% { right: 20px; transform: scaleX(1.1); }
+      80% { right: 10px; transform: scaleX(0.95); }
+      100% { right: 20px; transform: scaleX(1); }
+    }
+
+    @keyframes slideOutToRight {
+      0% { right: 20px; transform: scaleX(1); }
+      100% { right: -450px; transform: scaleX(0.7); }
+    }
+
+    @keyframes slideInFromLeft {
+      0% { left: -450px; transform: scaleX(0.7); }
+      60% { left: 20px; transform: scaleX(1.1); }
+      80% { left: 10px; transform: scaleX(0.95); }
+      100% { left: 20px; transform: scaleX(1); }
+    }
+
+    @keyframes slideOutToLeft {
+      0% { left: 20px; transform: scaleX(1); }
+      100% { left: -450px; transform: scaleX(0.7); }
+    }
+
+    /* Responsive */
+    @media screen and (max-width: 600px) {
+      .banner {
+        max-width: 80%;
+        font-size: 14px;
+      }
+    }
+
+    .off-icon{
+        display: flex;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Offline Message Box -->
+  <div id="offlineBanner" class="banner offline">
+<div class="off-icon">
+        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQZTfeZyVr7GyW1ygsIqMmADllxP3iwG1h6gw&s" alt="off" style="height: 25px;width: 25px;margin-top: 2px;border-radius: 100%;">
+    
+    <span style="margin-top: 6.5px;margin-left: 8px;font-size: small;font-family: monospace;">Offline : No Internet Connection.</span>
+    
+    </div>
+        <button class="close-btn" onclick="closeBanner('offlineBanner')">
+      <svg width="20" height="20" viewBox="0 0 24 24">
+        <path fill="#fff" d="M18.3 5.71a1 1 0 0 0-1.41 0L12 10.59 7.11 5.7A1 1 0 0 0 5.7 7.11L10.59 12l-4.89 4.89a1 1 0 1 0 1.41 1.41L12 13.41l4.89 4.89a1 1 0 0 0 1.41-1.41L13.41 12l4.89-4.89a1 1 0 0 0 0-1.4z"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Online Message Box -->
+  <div id="onlineBanner" class="banner online">
+    <div class="off-icon">
+        <img src="https://media.istockphoto.com/id/1185464424/vector/wi-fi-internet-icon-vector-wi-fi-wlan-access-wireless-wifi-hotspot-signal-sign.jpg?s=612x612&w=0&k=20&c=t1mOV49cBXkZJqX6qIef6biAbnsWRRjmIRIRtRWKW1g=" alt="on" style="height: 20px;width: 20px;margin-top: 2px;border-radius: 100%;border: 2px solid black;">
+    
+    <span style="margin-top: 6.5px;margin-left: 8px;font-size: small;font-family: monospace;">Online : Connection Restored.</span>
+    
+    </div>
+    <button class="close-btn" onclick="closeBanner('onlineBanner')">
+      <svg width="20" height="20" viewBox="0 0 24 24">
+        <path fill="#fff" d="M18.3 5.71a1 1 0 0 0-1.41 0L12 10.59 7.11 5.7A1 1 0 0 0 5.7 7.11L10.59 12l-4.89 4.89a1 1 0 1 0 1.41 1.41L12 13.41l4.89 4.89a1 1 0 0 0 1.41-1.41L13.41 12l4.89-4.89a1 1 0 0 0 0-1.4z"/>
+      </svg>
+    </button>
+  </div>
+
+  <script>
+    function showBanner(type) {
+      const banner = document.getElementById(`${type}Banner`);
+      banner.style.display = 'flex';
+
+      // Remove old animation
+      banner.style.animation = 'none';
+      banner.offsetHeight; // trigger reflow
+
+      // Add new animation
+      if (type === 'offline') {
+        banner.style.animation = 'slideInFromRight 0.6s ease-out forwards';
+      } else {
+        banner.style.animation = 'slideInFromLeft 0.6s ease-out forwards';
+      }
+
+      // Auto close after 4 seconds
+      setTimeout(() => {
+        if (banner.style.display === 'flex') {
+          if (type === 'offline') {
+            banner.style.animation = 'slideOutToRight 0.6s ease-in forwards';
+          } else {
+            banner.style.animation = 'slideOutToLeft 0.6s ease-in forwards';
+          }
+
+          setTimeout(() => {
+            banner.style.display = 'none';
+          }, 600);
+        }
+      }, 4000);
+    }
+
+    function closeBanner(id) {
+      const banner = document.getElementById(id);
+      if (id === 'offlineBanner') {
+        banner.style.animation = 'slideOutToRight 0.6s ease-in forwards';
+      } else {
+        banner.style.animation = 'slideOutToLeft 0.6s ease-in forwards';
+      }
+      setTimeout(() => {
+        banner.style.display = 'none';
+      }, 600);
+    }
+
+    // Listen for online/offline events
+    window.addEventListener('offline', () => showBanner('offline'));
+    window.addEventListener('online', () => showBanner('online'));
+
+    // Optional: Show current status on load
+    if (!navigator.onLine) {
+      showBanner('offline');
+    }
+  </script>
+
+</body>
+</html>

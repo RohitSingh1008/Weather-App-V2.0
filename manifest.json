@@ -1,0 +1,27 @@
+{
+    "name": "",
+    "short_name": "Weather",
+    "start_url": "./",
+    "display": "standalone",
+    "background_color": "#dcdcdc",
+    "theme_color": "#dcdcdc",
+    "version": "1.1.0",
+    "orientation": "portrait",
+    "prefer_related_applications": false,
+    "icons": [
+      {
+        "src": "https://purepng.com/public/uploads/large/purepng.com-weather-iconsymbolsiconsapple-iosiosios-8-iconsios-8-721522596142qx4ep.png",
+        "sizes": "192x192",
+        "type": "image/png"
+      },
+      {
+        "src": "https://purepng.com/public/uploads/large/purepng.com-weather-iconsymbolsiconsapple-iosiosios-8-iconsios-8-721522596142qx4ep.png",
+        "sizes": "512x512",
+        "type": "image/png"
+      }
+    ]
+  }
+  
+
+  
+  

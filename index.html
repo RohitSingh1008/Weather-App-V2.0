@@ -1,0 +1,993 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0 user-scalable=no">
+    <title>Weather App</title>
+    <link rel="manifest" href="/manifest.json" />
+   <meta name="theme-color" content="#dcdcdc" />    
+   <link rel="icon" href="https://purepng.com/public/uploads/large/purepng.com-weather-iconsymbolsiconsapple-iosiosios-8-iconsios-8-721522596142qx4ep.png">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        /* === YOUR ORIGINAL CSS (kept unchanged) === */
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #dcdcdc;
+            font-family: sans-serif;
+              overflow: hidden;
+        }
+
+        body {
+    -webkit-user-select: none; /* Disable text selection */
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+
+        * {
+            padding: 0;
+            margin: 0;
+        }
+
+        main {
+            width: 300px;
+            height: max-content;
+            min-height: 300px;
+            background-image: linear-gradient(to bottom, #dcdcdc 55%, #e9e9e9 50%);
+            border-radius: 30px;
+            box-shadow: 0 30px 50px #5553;
+            padding: 30px;
+            box-sizing: border-box;
+        }
+
+        main form {
+            border: 1px solid #5552;
+            display: flex;
+            border-radius: 30px;
+            justify-content: space-between;
+            background-color: #f7f7f7;
+
+        }
+
+        main form input,
+        main form button {
+            border: none;
+            background-color: transparent;
+            outline: none;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
+        main form i {
+            opacity: 0.7;
+        }
+
+        main .result {
+            padding-top: 20px;
+            text-align: center;
+        }
+
+        main .result .name {
+            font-weight: bold;
+            font-size: large;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        main .temperature img {
+            width: 150px;
+            filter: drop-shadow(0 10px 50px #555);
+        }
+
+        main .temperature figcaption {
+            font-size: 3em;
+        }
+
+        main .description {
+            padding: 10px 0 30px;
+        }
+
+       main ul {
+  list-style: none;
+  display: flex; 
+  /*display: grid;
+  grid-template-columns: repeat(3, 1fr);         */       /* grid → flex */
+  gap: 10px;
+  overflow-x: auto;              /* horizontal scroll enable */
+  padding-bottom: 10px;
+  scroll-behavior: smooth;       /* smooth scroll */
+  scrollbar-width: none;         /* hide scrollbar (Firefox) */
+}
+
+main ul::-webkit-scrollbar {
+  display: none;                 /* hide scrollbar (Chrome/Safari) */
+}
+main ul::after {
+  content: "";
+  flex: 0 0 20px;
+} main ul::before {
+  content: "";
+  flex: 0 0 20px;
+}
+
+
+        main li {
+            min-width: 75px;              /* card size fix */
+            flex: 0 0 auto;                /* prevent shrink/stretch */
+            background-color: #f78a55;
+            color: #fff;
+            border-radius: 10px;
+            padding: 20px 10px;
+            background-image: linear-gradient(to bottom, transparent 50%, #0003 50%);
+            font-weight: bold;
+            font-size: small;
+            box-shadow: rgba(0, 0, 0, 0.3) 0px 19px 38px, rgba(0, 0, 0, 0.22) 0px 15px 12px;
+        }
+
+        main ul li i {
+            font-size: 2em;
+            margin: 20px 0;
+            display: block !important;
+        }
+
+        main li:nth-child(2) {
+            background-color: #b56291;
+        }
+
+        main li:nth-child(3) {
+            background-color: #48567b;
+        }
+
+        main li:nth-child(4) {
+    background-color: #00796b;
+}
+main li:nth-child(5) {
+  background-color: #5c6bc0; /* soft indigo for "feels like" */
+}
+
+main li:nth-child(6) {
+  background-color: #0288d1; /* sky blue for "visibility" */
+}
+
+main li:nth-child(7) {
+  background-color: #6d4c41; /* earthy brown for "rain" */
+}
+
+main li:nth-child(8) {
+  background-color: #8e24aa; /* purple for "AQI" */
+}
+main li:hover {
+  transform: scale(1.05);
+  filter: brightness(1.15);
+  transition: 0.3s ease;
+}
+
+
+
+        main.error {
+            animation: errorEffect 0.3s linear 1;
+        }
+
+        @keyframes errorEffect {
+            0% {
+                transform: translate(10px, 5px)
+            }
+
+            25% {
+                transform: translate(-5px, 0)
+            }
+
+            50% {
+                transform: translate(8px, 2px)
+            }
+
+            75% {
+                transform: translate(-2px, 5px)
+            }
+
+            100% {
+                transform: translate(0, 0);
+            }
+        }
+
+        /* Base Message Style */
+.message {
+    position: fixed;
+    width: 100%;
+    max-width: 350px;
+    margin: 0 auto;
+    padding: 10px 20px;
+    color: white;
+    font-weight: bold;
+    border-radius: 8px;
+    font-size: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 9999;
+    visibility: hidden; /* Default hidden */
+    cursor: pointer;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    transition: visibility 0.3s ease, transform 0.5s ease;
+}
+
+/* Close Button (SVG) */
+.message svg {
+    cursor: pointer;
+    fill: white;
+    margin-left: 15px;
+    width: 20px;
+    height: 20px;
+}
+
+/* Offline Message (Red, Bottom Left to Right) */
+.message.offline {
+    bottom: 20px; /* Positioned at bottom */
+    left: -100%; /* Start off-screen on the left */
+    background-color: #f44336; /* Red color */
+    animation: slideLeftToRight 1s ease-out, rubberIn 0.5s ease-out 1s;
+}
+
+/* Online Message (Green, Top Right to Left) */
+.message.online {
+    top: 20px; /* Positioned at top */
+    right: -100%; /* Start off-screen on the right */
+    background-color: #4CAF50; /* Green color */
+    animation: slideRightToLeft 1s ease-out, rubberIn 0.5s ease-out 1s;
+}
+
+/* Keyframe Animations */
+@keyframes rubberIn {
+    0% {
+        transform: scaleX(0.5);
+    }
+    25% {
+        transform: scaleX(1.1);
+    }
+    50% {
+        transform: scaleX(1.0);
+    }
+    75% {
+        transform: scaleX(1.1);
+    }
+    100% {
+        transform: scaleX(1);
+    }
+}
+
+@keyframes slideLeftToRight {
+    0% {
+        transform: translateX(-100%); /* Start off-screen to the left */
+    }
+    100% {
+        transform: translateX(0); /* Slide into the screen */
+    }
+}
+
+@keyframes slideRightToLeft {
+    0% {
+        transform: translateX(100%); /* Start off-screen to the right */
+    }
+    100% {
+        transform: translateX(0); /* Slide into the screen */
+    }
+}
+
+/* Close notification on click */
+.message.hide {
+    visibility: hidden;
+    transform: translateX(100%); /* Hide off-screen */
+}
+
+/* root par lagao */
+html, body {
+  height: 100%;
+  overscroll-behavior-y: none; /* prevents pull-to-refresh */
+    overscroll-behavior-x: none;  
+  -webkit-overflow-scrolling: touch;
+}
+
+/* agar aapka main content kisi scrollable div me hai to us par bhi lagao */
+#app, .scroll-container {
+  overscroll-behavior: none;
+}
+
+/* === end original CSS === */
+
+/* Small additions (only IDs + minimal elements used by JS). No layout change. */
+#locBtn {
+  color: #0d47a1;
+  background: transparent;
+  border: none;
+  font-size: 1.1em;
+  cursor: pointer;
+  padding: 8px;
+}
+    </style>
+</head>
+<body>
+    <!-- audio kept same -->
+<audio id="startupSound" autoplay preload="auto" volume="0" muted style="display:none;">
+    <source src="ai-detect.mp3" type="audio/mpeg">
+</audio>
+<style>
+    #footerFixed {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    background: #fff;
+    color: #000f54;
+    
+    font-weight: 600;
+    font-size: small;
+    text-align: center;
+    padding: 6px 0;
+    border-top-left-radius: 50px;
+    border-top-right-radius: 50px;
+    z-index: 9999;
+    transition: transform 0.3s 
+ease-out;
+padding: 10px;
+}
+
+
+</style>
+<div id="footerFixed">
+    <div style="color: #093d6a;">💻 Developed with 💖 by Rohit Singh 🌩️</div>
+  </div>
+
+    <main id="app" style="width: 100%;
+    height: 100vh;
+    background-color: #f7f7f7;
+    box-shadow: 0 30px 50px #5553;
+    padding: 30px;
+    border-radius: 0%;
+    box-sizing: border-box;">
+      <div class="scroll-container">
+          <!-- Add small id to form and a location button - layout visually same -->
+          <form id="searchForm">
+            <input type="text" id="name" autocomplete="off" placeholder="Enter City" style="color: #1c1c1c;padding-left: 15px;width: 100%;">
+            <button id="searchBtn" style="cursor: pointer;margin-top: 4.2px;color: #1c1c1c;" aria-label="Search">
+                <i class="fa-solid fa-magnifying-glass"></i>
+            </button>
+            <a style="margin-top: 3px;" href="https://www.google.com/maps/place/Bihar/@25.8979488,84.4875049,8z/data=!3m1!4b1!4m6!3m5!1s0x39ed5844f0bb6903:0x57ad3fed1bbae325!8m2!3d25.9644427!4d85.2722472!16zL20vMDI5MHJi?entry=ttu&g_ep=EgoyMDI1MTAwOC4wIKXMDSoASAFQAw%3D%3D" target="_blank" rel="noopener noreferrer"><button id="locBtn" title="Use my location" type="button" aria-label="Use my location" style="color: #1c1c1c;"><i class="fa-solid fa-location-crosshairs"></i></button></a>
+            <!-- location button (minimal visual impact) 
+            <button id="locBtn" title="Use my location" type="button" aria-label="Use my location" style="color: #1c1c1c;"><i class="fa-solid fa-location-crosshairs"></i></button>-->
+        </form>
+
+
+
+        <section id="weatherSection" class="result">
+            <figure class="name">
+                <figcaption id="cityCaption">Bhilai, India</figcaption>
+                <img id="countryFlag" src="https://flagsapi.com/IN/shiny/32.png" width="32" height="32"><!--https://shortpixel.com/img/spinner2.gif-->
+            </figure>
+
+            <figure class="temperature">
+                <img id="weatherIcon" src="https://openweathermap.org/img/wn/10d@4x.png">
+               <figcaption class="temp-container">
+  <span id="tempSpan" class="temp-value">32.3 °C</span>
+ <p class="description" id="desc" style="text-transform: capitalize;font-size: 0.4em;">Overcast Clouds</p>
+
+  <button id="toggleTemp" class="ai-btn ai-border">Show °F</button>
+</figcaption>
+
+<style>
+/* Temperature container styling */
+.temp-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #111;
+}
+
+/* Temperature value styling */
+.temp-value {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #0d47a1;
+  margin-bottom: 10px;
+  text-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+/* AI-style button */
+.ai-btn {
+  padding: 8px 18px;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  color: white;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  margin-top: -20px;
+}
+.ai-btn.ai-border::before {
+  content: '';
+  position: absolute;
+  inset: -2px; /* border width */
+  background: linear-gradient(45deg,
+    #00f0ff,
+    #0078ff,
+    #ff00f7,
+    #00ff88,
+    #ffae00,
+    #00f0ff);
+  background-size: 400%;
+  border-radius: inherit;
+  z-index: -1;
+  filter: blur(2px);
+  animation: gradientFlow 6s linear infinite;
+}
+.ai-btn.ai-border::after {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);
+  border-radius: inherit;
+  z-index: -1;
+}
+/* Glow animation */
+@keyframes gradientFlow {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.ai-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+  background: linear-gradient(135deg, #43a6f9 0%, #00e0ff 100%);
+}
+
+.ai-btn:active {
+  transform: translateY(1px);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+</style>
+
+            </figure>
+            
+            <!-- Keep ul class same; added extra li's for advanced features but layout unchanged -->
+            <ul class="weather-scroll" id="weatherScroll" style="margin-top: 20px;border-top: 4px solid #4facfe;border-bottom: 4px solid #00f2fe ;">
+                <li>
+                    <span style="text-transform: capitalize;">clouds</span>
+                    <i class="fa-solid fa-cloud"></i>
+                    <span id="clouds">63.0 %</span>
+                </li>
+                <li>
+                    <span style="text-transform: capitalize;">humidity</span>
+                    <i class="fa-solid fa-droplet"></i>
+                    <span id="humidity">78.0 %</span>
+                </li>
+                <li>
+                    <span style="text-transform: capitalize;">pressure</span>
+                    <i class="fa-solid fa-gauge"></i>
+                    <span id="pressure">1011.0 hPa</span>
+                </li>
+                 <li>
+                    <span style="text-transform: capitalize;">wind</span>
+                    <i class="fa-solid fa-wind"></i>
+                    <span id="wind">0 m/s</span>
+                </li>
+
+                <!-- Added advanced cards (kept same visual style) -->
+                <li>
+                  <span style="text-transform: capitalize;">feels like</span>
+                  <i class="fa-solid fa-temperature-half"></i>
+                  <span id="feelsLike">20.6 °C</span>
+                </li>
+                <li>
+                  <span style="text-transform: capitalize;">visibility</span>
+                  <i class="fa-solid fa-eye"></i>
+                  <span id="visibility">10.50 km</span>
+                </li>
+                <li>
+                  <span style="text-transform: capitalize;">rain (1h)</span>
+                  <i class="fa-solid fa-cloud-rain"></i>
+                  <span id="rain">0 mm</span>
+                </li>
+                <li>
+                  <span style="text-transform: capitalize;">air quality</span>
+                  <i class="fa-solid fa-smog"></i>
+                  <span id="aqi">3 (Moderate)</span>
+                </li>
+            </ul>
+
+            <!-- sunrise 🌅/ sunset / 🌇local time (kept minimal, 🕒same place) -->
+            <div class="info-row" style="display:flex;justify-content:center;gap:12px;margin-top:10px;">
+              <div><img src="https://gifdb.com/images/high/sunrise-mountain-illustration-020lsezx07fd0k8x.gif" height="32" width="60" style="border-radius: 10px;"><br><span id="sunrise" class="skeleton">-------</span></div>
+              <div><img src="https://media1.tenor.com/images/b4a48ab722af0d4a42a38e8c5dad2a9c/tenor.gif?itemid=7471758" height="32" width="60" style="border-radius: 10px;"><br><span id="sunset" class="skeleton">-------</span></div>
+              <div><img src="https://s-media-cache-ak0.pinimg.com/originals/3f/82/40/3f8240fa1d16d0de6d4e7510b43b37ba.gif" height="32" width="60" style="border-radius: 10px;"><br><span id="localTime" class="skeleton">-------</span></div>
+            </div>
+            <style>
+                
+.skeleton {
+  
+  width: 50px;
+  height: 16px;
+  background: #ccc;
+  border-radius: 4px;
+  animation: pulse 1.2s infinite;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+@keyframes pulse {
+  0% { opacity: 0.5; }
+  50% { opacity: 1; }
+  100% { opacity: 0.5; }
+}
+</style>
+        </section>
+      </div>
+    </main>
+
+  <audio id="aiDetectAudio" src="https://orangefreesounds.com/wp-content/uploads/2023/05/Artificial-intelligence-sound.mp3" autoplay preload="auto" volume="0" muted style="display:none;"></audio>
+
+<script>
+/* ================= CONFIG ================= */
+const id = '9505fd1df737e20152fbd78cdb289b6a';
+const baseUrl = 'https://api.openweathermap.org/data/2.5/weather?units=metric&appid=' + id;
+const airPollutionUrl = 'https://api.openweathermap.org/data/2.5/air_pollution';
+
+/* =============== DOM ================= */
+const form = document.getElementById('searchForm');
+const input = document.getElementById('name');
+const searchBtn = document.getElementById('searchBtn');
+//const locBtn = document.getElementById('locBtn');
+
+
+const cityCaption = document.getElementById('cityCaption');
+const countryFlag = document.getElementById('countryFlag');
+const weatherIcon = document.getElementById('weatherIcon');
+const tempSpan = document.getElementById('tempSpan');
+const descEl = document.getElementById('desc');
+const toggleTemp = document.getElementById('toggleTemp');
+
+const cloudsEl = document.getElementById('clouds');
+const humidityEl = document.getElementById('humidity');
+const pressureEl = document.getElementById('pressure');
+const windEl = document.getElementById('wind');
+const feelsLikeEl = document.getElementById('feelsLike');
+const visibilityEl = document.getElementById('visibility');
+const rainEl = document.getElementById('rain');
+const aqiEl = document.getElementById('aqi');
+const sunriseEl = document.getElementById('sunrise');
+const sunsetEl = document.getElementById('sunset');
+const localTimeEl = document.getElementById('localTime');
+
+/* =============== GLOBALS ================= */
+let currentWeather = null;
+let showCelsius = true;
+
+/* Weather sounds (replace these mp3 paths with your local files) */
+/* === Realistic Weather Sounds === */
+const sounds = {
+  rain: new Audio('sounds/rain.mp3'),
+  thunder: new Audio('sounds/thunder.mp3'),
+  drizzle: new Audio('sounds/drizzle.mp3'),
+  storm: new Audio('sounds/storm.mp3'),
+  snow: new Audio('sounds/snow.mp3'),
+  wind: new Audio('sounds/wind.mp3'),
+  cloudy: new Audio('sounds/cloudy.mp3'),
+  sunny: new Audio('sounds/sunny.mp3'),
+  fog: new Audio('sounds/fog.mp3'),
+  haze: new Audio('sounds/haze.mp3'),
+  mist: new Audio('sounds/mist.mp3'),
+  night: new Audio('sounds/night.mp3'),
+  clear: new Audio('sounds/cloudy.mp3')
+};
+
+/* =============== HELPERS ================= */
+function toTime(ts, tzOffset) {
+  const d = new Date((ts + (tzOffset || 0)) * 1000);
+  return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+}
+function toFahrenheit(c) { return (c * 9 / 5) + 32; }
+function smoothUpdate(el, newValue, unit = '') {
+  const start = parseFloat(el.innerText) || 0;
+  const diff = newValue - start;
+  let progress = 0;
+  const duration = 700;
+  const step = 16;
+  function animate() {
+    progress += step;
+    const val = start + diff * Math.min(progress / duration, 1);
+    el.innerText = val.toFixed(1) + (unit ? ' ' + unit : '');
+    if (progress < duration) requestAnimationFrame(animate);
+  }
+  animate();
+}
+function speak(text) {
+  if (!('speechSynthesis' in window)) return;
+  const u = new SpeechSynthesisUtterance(text);
+  u.rate = 1; u.pitch = 1; u.lang = 'hi-IN';
+  window.speechSynthesis.cancel();
+  window.speechSynthesis.speak(u);
+}
+//====================== Play Sound Start================
+/* optional: loop all sounds for continuous ambience */
+Object.values(sounds).forEach(s => s.loop = true);
+
+/* === function to play sound dynamically === */
+function playWeatherSound(condition) {
+  // stop any currently playing sound
+  Object.values(sounds).forEach(s => { s.pause(); s.currentTime = 0; });
+
+  condition = condition.toLowerCase();
+
+  if (condition.includes('thunder')) sounds.thunder.play();
+  else if (condition.includes('storm')) sounds.storm.play();
+  else if (condition.includes('rain')) sounds.rain.play();
+  else if (condition.includes('drizzle')) sounds.drizzle.play();
+  else if (condition.includes('snow')) sounds.snow.play();
+  else if (condition.includes('wind')) sounds.wind.play();
+  else if (condition.includes('cloud')) sounds.cloudy.play();
+  else if (condition.includes('fog')) sounds.fog.play();
+  else if (condition.includes('haze')) sounds.haze.play();
+  else if (condition.includes('mist')) sounds.mist.play();
+  else if (condition.includes('clear')) sounds.clear.play();
+  else if (condition.includes('sun') || condition.includes('bright')) sounds.sunny.play();
+  else sounds.cloudy.play(); // default fallback
+}
+//====================== Play Sound End================
+
+
+function interpretAQI(aqi) {
+  if (aqi === 1) return "Good";
+  if (aqi === 2) return "Fair";
+  if (aqi === 3) return "Moderate";
+  if (aqi === 4) return "Poor";
+  if (aqi === 5) return "Very Poor";
+  return "--";
+}
+function fetchAirQuality(lat, lon) {
+  return fetch(`${airPollutionUrl}?lat=${lat}&lon=${lon}&appid=${id}`)
+    .then(r => r.json())
+    .then(d => d.list && d.list[0] ? d.list[0].main.aqi : 0)
+    .catch(() => 0);
+}
+
+/* =============== COUNTRY NAMES =============== */
+const countryNames = {
+  "AD": "Andorra", "AE": "United Arab Emirates", "AF": "Afghanistan", "AG": "Antigua and Barbuda", "AI": "Anguilla",
+  "AL": "Albania", "AM": "Armenia", "AO": "Angola", "AR": "Argentina", "AS": "American Samoa", "AT": "Austria",
+  "AU": "Australia", "AW": "Aruba", "AX": "Åland Islands", "AZ": "Azerbaijan", "BA": "Bosnia and Herzegovina",
+  "BB": "Barbados", "BD": "Bangladesh", "BE": "Belgium", "BF": "Burkina Faso", "BG": "Bulgaria", "BH": "Bahrain",
+  "BI": "Burundi", "BJ": "Benin", "BL": "Saint Barthélemy", "BM": "Bermuda", "BN": "Brunei Darussalam", "BO": "Bolivia",
+  "BQ": "Caribbean Netherlands", "BR": "Brazil", "BS": "Bahamas", "BT": "Bhutan", "BV": "Bouvet Island", "BW": "Botswana",
+  "BY": "Belarus", "BZ": "Belize", "CA": "Canada", "CC": "Cocos (Keeling) Islands", "CD": "Congo (Democratic Republic)",
+  "CF": "Central African Republic", "CG": "Congo (Republic)", "CH": "Switzerland", "CI": "Côte d'Ivoire", "CK": "Cook Islands",
+  "CL": "Chile", "CM": "Cameroon", "CN": "China", "CO": "Colombia", "CR": "Costa Rica", "CU": "Cuba", "CV": "Cabo Verde",
+  "CW": "Curaçao", "CX": "Christmas Island", "CY": "Cyprus", "CZ": "Czechia", "DE": "Germany", "DJ": "Djibouti", "DK": "Denmark",
+  "DM": "Dominica", "DO": "Dominican Republic", "DZ": "Algeria", "EC": "Ecuador", "EE": "Estonia", "EG": "Egypt", "EH": "Western Sahara",
+  "ER": "Eritrea", "ES": "Spain", "ET": "Ethiopia", "FI": "Finland", "FJ": "Fiji", "FM": "Micronesia (Federated States)",
+  "FO": "Faroe Islands", "FR": "France", "GA": "Gabon", "GB": "United Kingdom", "GD": "Grenada", "GE": "Georgia", "GF": "French Guiana",
+  "GG": "Guernsey", "GH": "Ghana", "GI": "Gibraltar", "GL": "Greenland", "GM": "Gambia", "GN": "Guinea", "GP": "Guadeloupe", "GQ": "Equatorial Guinea",
+  "GR": "Greece", "GT": "Guatemala", "GU": "Guam", "GW": "Guinea-Bissau", "GY": "Guyana", "HK": "Hong Kong", "HM": "Heard Island and McDonald Islands",
+  "HN": "Honduras", "HR": "Croatia", "HT": "Haiti", "HU": "Hungary", "ID": "Indonesia", "IE": "Ireland", "IL": "Israel", "IM": "Isle of Man",
+  "IN": "India", "IO": "British Indian Ocean Territory", "IQ": "Iraq", "IR": "Iran", "IS": "Iceland", "IT": "Italy", "JE": "Jersey", "JM": "Jamaica",
+  "JO": "Jordan", "JP": "Japan", "KE": "Kenya", "KG": "Kyrgyzstan", "KH": "Cambodia", "KI": "Kiribati", "KM": "Comoros", "KN": "Saint Kitts and Nevis",
+  "KP": "Korea (North)", "KR": "Korea (South)", "KW": "Kuwait", "KY": "Cayman Islands", "KZ": "Kazakhstan", "LA": "Laos", "LB": "Lebanon", "LC": "Saint Lucia",
+  "LI": "Liechtenstein", "LK": "Sri Lanka", "LR": "Liberia", "LS": "Lesotho", "LT": "Lithuania", "LU": "Luxembourg", "LV": "Latvia", "LY": "Libya", "MA": "Morocco",
+  "MC": "Monaco", "MD": "Moldova", "ME": "Montenegro", "MF": "Saint Martin", "MG": "Madagascar", "MH": "Marshall Islands", "MK": "North Macedonia", "ML": "Mali",
+  "MM": "Myanmar", "MN": "Mongolia", "MO": "Macao", "MP": "Northern Mariana Islands", "MQ": "Martinique", "MR": "Mauritania", "MS": "Montserrat", "MT": "Malta",
+  "MU": "Mauritius", "MV": "Maldives", "MW": "Malawi", "MX": "Mexico", "MY": "Malaysia", "MZ": "Mozambique", "NA": "Namibia", "NC": "New Caledonia", "NE": "Niger",
+  "NF": "Norfolk Island", "NG": "Nigeria", "NI": "Nicaragua", "NL": "Netherlands", "NO": "Norway", "NP": "Nepal", "NR": "Nauru", "NU": "Niue", "NZ": "New Zealand",
+  "OM": "Oman", "PA": "Panama", "PE": "Peru", "PF": "French Polynesia", "PG": "Papua New Guinea", "PH": "Philippines", "PK": "Pakistan", "PL": "Poland", "PM": "Saint Pierre and Miquelon",
+  "PN": "Pitcairn Islands", "PR": "Puerto Rico", "PT": "Portugal", "PW": "Palau", "PY": "Paraguay", "QA": "Qatar", "RE": "Réunion", "RO": "Romania", "RS": "Serbia",
+  "RU": "Russia", "RW": "Rwanda", "SA": "Saudi Arabia", "SB": "Solomon Islands", "SC": "Seychelles", "SD": "Sudan", "SE": "Sweden", "SG": "Singapore", "SH": "Saint Helena",
+  "SI": "Slovenia", "SJ": "Svalbard and Jan Mayen", "SK": "Slovakia", "SL": "Sierra Leone", "SM": "San Marino", "SN": "Senegal", "SO": "Somalia", "SR": "Suriname",
+  "SS": "South Sudan", "ST": "São Tomé and Príncipe", "SV": "El Salvador", "SX": "Sint Maarten", "SY": "Syria", "SZ": "Eswatini", "TC": "Turks and Caicos Islands",
+  "TD": "Chad", "TF": "French Southern and Antarctic Lands", "TG": "Togo", "TH": "Thailand", "TJ": "Tajikistan", "TK": "Tokelau", "TL": "Timor-Leste", "TM": "Turkmenistan",
+  "TN": "Tunisia", "TO": "Tonga", "TR": "Turkey", "TT": "Trinidad and Tobago", "TV": "Tuvalu", "TZ": "Tanzania", "UA": "Ukraine", "UG": "Uganda", "UM": "United States Minor Outlying Islands",
+  "US": "United States", "UY": "Uruguay", "UZ": "Uzbekistan", "VA": "Vatican City", "VC": "Saint Vincent and the Grenadines", "VE": "Venezuela", "VG": "British Virgin Islands",
+  "VI": "U.S. Virgin Islands", "VN": "Vietnam", "VU": "Vanuatu", "WF": "Wallis and Futuna", "WS": "Samoa", "YE": "Yemen", "YT": "Mayotte", "ZA": "South Africa", "ZM": "Zambia",
+  "ZW": "Zimbabwe"
+};
+
+
+/* =============== MAIN RENDER ================= */
+async function renderWeather(data, isCurrent=false, isSearch=false) {
+  currentWeather = data;
+  const countryCode = data.sys?.country || "IN";
+  const countryName = countryNames[countryCode] || countryCode;
+
+  const temp = showCelsius ? data.main.temp : toFahrenheit(data.main.temp);
+  const tempUnit = showCelsius ? "°C" : "°F";
+  const feelsUnit = showCelsius ? "°C" : "°F";
+
+  cityCaption.innerText = `${data.name}, ${countryName}`;
+  countryFlag.src = `https://flagsapi.com/${countryCode}/shiny/32.png`;
+  weatherIcon.src = `https://openweathermap.org/img/wn/${data.weather[0].icon}@4x.png`;
+  descEl.innerText = data.weather[0].description;
+
+  smoothUpdate(tempSpan, temp, tempUnit);
+  smoothUpdate(cloudsEl, data.clouds.all, "%");
+  smoothUpdate(humidityEl, data.main.humidity, "%");
+  smoothUpdate(pressureEl, data.main.pressure, "hPa");
+  smoothUpdate(windEl, data.wind.speed, "m/s (" + (data.wind.deg || 0) + "°)");
+  smoothUpdate(feelsLikeEl, data.main.feels_like, feelsUnit);
+  visibilityEl.innerText = (data.visibility / 1000).toFixed(1) + " km";
+  rainEl.innerText = (data.rain ? (data.rain['1h'] || 0) : 0) + " mm";
+    sunriseEl.innerText = toTime(data.sys.sunrise).replace(/am|pm/i, m => m.toUpperCase());  // India time, AM/PM uppercase
+    sunsetEl.innerText = toTime(data.sys.sunset).replace(/am|pm/i, m => m.toUpperCase());  // India time, AM/PM uppercase
+   // Local Time (live update)
+function updateLocalTime() {
+  const now = new Date();
+  localTimeEl.innerText = now.toLocaleTimeString('en-IN', {
+    hour: '2-digit',
+    minute: '2-digit',
+   
+    hour12: true
+  }).replace(/am|pm/i, m => m.toUpperCase());
+}
+
+// Pehle ek bar update karo
+updateLocalTime();
+
+// Phir har 1 second me update karo
+setInterval(updateLocalTime, 1000);
+
+
+  // AQI fetch + text mapping
+  const aqi = await fetchAirQuality(data.coord.lat, data.coord.lon);
+  const aqiText = interpretAQI(aqi);
+  aqiEl.innerText = `${aqi} (${aqiText})`;
+
+  // Weather sound + voice
+  playWeatherSound(data.weather[0].description);
+  if (isCurrent) speak(`Your current location is ${data.name}, ${countryName}`);
+  else if (isSearch) speak(`आपके द्वारा सर्च किया गया लोकेशन  ${data.name} hai, जो ${countryName} देश में hai`);
+}
+
+/* =============== FETCH ================= */
+async function fetchWeatherByCity(q) {
+  try {
+    speak("" + q);// "Fetching weather for" dalsakte hia 
+    const res = await fetch(baseUrl + '&q=' + encodeURIComponent(q));
+    const data = await res.json();
+    if (data.cod != 200) return speak("माफ़ कीजिए, आपके द्वारा सर्च किया गया लोकेशन नहीं मिल सका, कृपया सही नाम के साथ दोबारा सर्च करे।");
+    renderWeather(data, false, true);
+  } catch (e) { console.error(e); }
+}
+async function fetchWeatherByCoords(lat, lon) {
+  try {
+    speak("");//"Updating your location, please wait" ye bhi dal sakte hia optional hai...
+    const res = await fetch(baseUrl + '&lat=' + lat + '&lon=' + lon);
+    const data = await res.json();
+    if (data.cod != 200) return;
+    renderWeather(data, true, false);
+  } catch (e) { console.error(e); }
+}
+
+/* =============== GEOLOCATION =================
+function getCurrentLocationWeather() {
+  if (!navigator.geolocation) return alert("Geolocation not supported");
+  navigator.geolocation.getCurrentPosition(pos => {
+    fetchWeatherByCoords(pos.coords.latitude, pos.coords.longitude);
+  }, err => console.warn(err), { enableHighAccuracy: true });
+}
+ */
+
+/* =============== EVENTS ================= */
+form.addEventListener('submit', e => {
+  e.preventDefault();
+  const q = input.value.trim();
+  if (q) fetchWeatherByCity(q);
+  input.value = '';
+});
+searchBtn.addEventListener('click', e => {
+  e.preventDefault();
+  const q = input.value.trim();
+  if (q) fetchWeatherByCity(q);
+  input.value = '';
+});
+//locBtn.addEventListener('click', getCurrentLocationWeather);
+if (toggleTemp) {
+  toggleTemp.addEventListener('click', () => {
+    showCelsius = !showCelsius;
+    if (currentWeather) renderWeather(currentWeather);
+    toggleTemp.innerText = showCelsius ? 'Show °F' : 'Show °C';
+  });
+}
+
+window.addEventListener('load', () => {
+  // Default startup location: Bhilai (loads without asking for geolocation permission)
+  fetchWeatherByCity('Bhilai');
+});
+
+</script>
+<style>
+.weather-scroll {
+  display: flex;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    gap: 10px;
+    padding: 10px;
+
+    border-radius: 20px;
+    box-shadow: rgba(0, 0, 0, 0.3) 0px 19px 38px, rgba(0, 0, 0, 0.22) 0px 15px 12px;
+  
+}
+
+.weather-scroll::-webkit-scrollbar {
+  display: none;
+}
+</style>
+
+<script>
+// ===== Auto Scroll + Manual Control =====
+const scrollContainer = document.getElementById("weatherScroll");
+let scrollAmount = 1; // speed
+let scrollDirection = 1; // 1 = right, -1 = left
+let isUserInteracting = false; // pause on user scroll
+
+function autoScroll() {
+  if (!isUserInteracting) {
+    scrollContainer.scrollLeft += scrollAmount * scrollDirection;
+    if (scrollContainer.scrollLeft + scrollContainer.clientWidth >= scrollContainer.scrollWidth) {
+      scrollDirection = -1;
+    } else if (scrollContainer.scrollLeft <= 0) {
+      scrollDirection = 1;
+    }
+  }
+  requestAnimationFrame(autoScroll);
+}
+
+// Pause auto-scroll while user interacts
+scrollContainer.addEventListener("mousedown", () => (isUserInteracting = true));
+scrollContainer.addEventListener("touchstart", () => (isUserInteracting = true));
+scrollContainer.addEventListener("mouseup", () => (isUserInteracting = false));
+scrollContainer.addEventListener("touchend", () => (isUserInteracting = false));
+scrollContainer.addEventListener("wheel", () => {
+  isUserInteracting = true;
+  clearTimeout(scrollContainer._wheelTimeout);
+  scrollContainer._wheelTimeout = setTimeout(() => (isUserInteracting = false), 1500);
+});
+
+window.addEventListener("load", () => requestAnimationFrame(autoScroll));
+</script>
+
+<!-- 🌍 Fake Native Location Popup 
+ <div id="locationModal" style="position: fixed; inset: 0px; display: none; align-items: center; justify-content: center; background: rgba(0, 0, 0, 0.45); backdrop-filter: blur(6px); z-index: 9999; animation: 0.4s ease 0s 1 normal none running fadeIn;">
+  <div style="
+    background: #fff;
+    border-radius: 18px;
+    padding: 22px 25px;
+    width: 300px;
+    max-width: 90%;
+    box-shadow: 0 6px 25px rgba(0,0,0,0.25);
+    text-align: center;
+    font-family: 'Segoe UI', system-ui;
+    position: relative;
+  ">
+    <div style="
+      background: linear-gradient(135deg,#4facfe,#00f2fe);
+      width: 64px; height: 64px; 
+      margin: 0 auto 12px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 0 18px rgba(79,172,254,0.6);
+      animation: pulse 2s infinite;
+    ">
+      <i class="fa-solid fa-location-crosshairs" style="font-size:28px;color:white;"></i>
+    </div>
+    <h3 style="font-size:18px;margin:8px 0;color:#111;">Allow Location Access</h3>
+    <p style="font-size:14px;color:#444;margin:0 0 14px;">BSP Weather needs access to your location to show real-time weather updates for your area.</p>
+    <div style="display:flex;gap:10px;justify-content:center;">
+      <button id="denyBtn" style="
+        flex:1;
+        border:none;
+        background:#eee;
+        color:#333;
+        padding:8px;
+        border-radius:8px;
+        cursor:pointer;
+        font-weight:500;
+      " fdprocessedid="vcrn0t">Deny</button>
+      <button id="allowBtn" style="
+        flex:1;
+        border:none;
+        background: linear-gradient(90deg,#4facfe,#00f2fe);
+        color:white;
+        padding:8px;
+        border-radius:8px;
+        cursor:pointer;
+        font-weight:500;
+        box-shadow:0 0 10px rgba(79,172,254,0.4);
+      " fdprocessedid="cl38ad">Allow</button>
+    </div>
+  </div>
+</div>
+<script>
+const modal = document.getElementById("locationModal");
+const allowBtn = document.getElementById("allowBtn");
+const denyBtn = document.getElementById("denyBtn");
+
+// Allow click → hide modal + call real geolocation
+allowBtn.addEventListener("click", () => {
+  modal.style.display = "none";
+  // Optional vibration (mobile)
+  if (navigator.vibrate) navigator.vibrate(50);
+  // Actual geolocation call
+  getCurrentLocationWeather();
+});
+
+// Deny click → just hide (no location)
+denyBtn.addEventListener("click", () => {
+  modal.style.display = "none";
+  if (navigator.vibrate) navigator.vibrate(30);
+});
+</script>
+-->
+
+
+
+
+
+<script>
+  /*  //For PWA, swipe gestures should not cause page reload. You can prevent the default behavior like this:
+// Disable swipe-to-refresh
+document.addEventListener('touchmove', function(event) {
+    event.preventDefault();  // Prevent the default swipe gesture
+}, { passive: false });
+
+// Prevent the browser's refresh gesture
+window.addEventListener('beforeunload', function(event) {
+    // Optionally, show a confirmation dialog or stop the refresh
+    event.preventDefault();
+    event.returnValue = '';  // Standard way to trigger browser confirmation
+});
+
+// For Android PWA: Disable the loading bar on refresh by preventing reloading
+window.addEventListener('load', function() {
+    if (navigator.standalone) {
+        // When the PWA is in standalone mode (i.e., launched from home screen)
+        document.body.style.overscrollBehavior = 'none';  // Disable overscroll behavior
+    }
+});
+
+*/
+//============================\/\/\/\/==================================================
+//1. Disable Right-Click (Context Menu) using JavaScript:                      
+document.addEventListener('contextmenu', function(e) {                         
+    e.preventDefault();  // Prevent right-click menu                                  
+});                                                                             
+                                                                                 
+// 2. Disable Image Download (Right-Click Image Download):                      
+document.querySelectorAll('img').forEach(img => {
+    img.addEventListener('contextmenu', function(e) {
+        e.preventDefault();  // Prevent right-click on images
+    });
+    
+    img.addEventListener('dragstart', function(e) {
+        e.preventDefault();  // Disable dragging of images
+    });
+});
+</script>
+
+
+
+ <!-- Service Worker (kept) -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/service-worker.js')
+        .then(() => console.log('✅ Service Worker registered'))
+        .catch(error => console.error('❌ Service Worker registration failed:', error));
+    }
+  </script>
+
+</body>
+</html>
